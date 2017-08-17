@@ -1,11 +1,17 @@
 package model;
 
 import controller.Controller;
+import jts.geom.Coordinate;
 import jts.geom.LineString;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,6 +103,7 @@ public class Points {
                 lines.add(new Line2D.Double(intersectionPoints.get(i), intersectionPoints.get(j)));
             }
         }
+
         return lines;
     }
 
@@ -135,7 +142,7 @@ public class Points {
         return allLines.stream().map(lines -> getLineLineIntersection(currentLine, lines));
     }
 
-    public ArrayList<Line2D> getAllNonIntersectingLinesFromInstersectionPointLines(){
+    public ArrayList<Line2D> getAllNonIntersectingLinesFromIntersectionPointLines(){
         Comparator<Line2D> sortByDescendingLength = (Line2D lineOne, Line2D lineTwo) ->
                 Double.compare(distanceBetween(lineTwo.getP1(),lineTwo.getP2()), distanceBetween(lineOne.getP1(),lineOne.getP2()));
         ArrayList<Line2D> lines = cont.getPoints().getAllPointToPointLinesFromIntersectionPoints();
@@ -191,6 +198,27 @@ public class Points {
             if(candidateLine.intersectsLine(line))return true;
         }
         return false;
+    }
+
+    private Coordinate[] sanitizeDoublePoints(Coordinate[] points){
+        for(int i = 0; i < points.length; i++){
+            for(int j = i + 1; j < points.length; j++){
+                if(Math.abs(points[i].x - points[j].x) < 0.1
+                        && Math.abs(points[i].y - points[j].y) < 0.1){
+                    points[i].x = points[j].x;
+                    points[i].y = points[j].y;
+                }
+            }
+        }
+        return points;
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
 

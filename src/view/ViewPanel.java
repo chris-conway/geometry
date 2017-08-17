@@ -2,9 +2,7 @@ package view;
 
 import controller.Controller;
 import jts.geom.*;
-import jts.geom.Point;
 import jts.geom.Polygon;
-import jts.geom.impl.CoordinateArraySequence;
 import jts.operation.polygonize.Polygonizer;
 import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.diagram.PowerDiagram;
@@ -119,39 +117,19 @@ public class ViewPanel extends JPanel {
         }
     }
 
-    private Coordinate[] sanitizeDoublePoints(Coordinate[] points){
-        for(int i = 0; i < points.length; i++){
-            for(int j = i + 1; j < points.length; j++){
-                if(Math.abs(points[i].x - points[j].x) < 0.1
-                        && Math.abs(points[i].y - points[j].y) < 0.1){
-                    points[i].x = points[j].x;
-                    points[i].y = points[j].y;
-                }
-            }
-        }
-        return points;
-    }
 
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.DOWN);
-        return bd.doubleValue();
-    }
 
     private void findPolygons(Graphics2D g){
         Polygonizer polygonizer = new Polygonizer();
         GeometryFactory geometryFactory = new GeometryFactory();
-        List<Line2D> lines = cont.getPoints().getAllNonIntersectingLinesFromInstersectionPointLines();
+        List<Line2D> lines = cont.getPoints().getAllNonIntersectingLinesFromIntersectionPointLines();
         lines = lines.stream().distinct().collect(Collectors.toList());
         CoordinateSequenceFactory coordinateSequenceFactory = geometryFactory.getCoordinateSequenceFactory();
         ArrayList<LineString> lineStrings = new ArrayList<>();
         for (Line2D line : lines) {
             Coordinate[] coords = new Coordinate[2];
-            coords[0] = new Coordinate(round(line.getX1(), 3), round(line.getY1(), 3));
-            coords[1] = new Coordinate(round(line.getX2(), 3), round(line.getY2(), 3));
-            coords = sanitizeDoublePoints(coords);
+            coords[0] = new Coordinate(line.getX1(), line.getY1());
+            coords[1] = new Coordinate(line.getX2(), line.getY2());
             lineStrings.add(new LineString(coordinateSequenceFactory.create(coords), geometryFactory));
         }
 

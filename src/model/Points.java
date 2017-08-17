@@ -107,16 +107,16 @@ public class Points {
         return lines;
     }
 
-    public ArrayList<Line2D> getAllPointToPointLines() {
-        int counter = 0;
+    public ArrayList<Line2D> getAllPointToPointLines(){
         ArrayList<Line2D> allLines = new ArrayList<>();
-        while (counter < points.size()) {
-            Point2D point1 = points.get(counter);
-            for (int j = counter + 1; j < points.size(); j++) {
-                Point2D point2 = points.get(j);
-                allLines.add(new Line2D.Double(point1.getX(), point1.getY(), point2.getX(), point2.getY()));
+        for(int i = 0; i < points.size(); i++){
+            for (int j = i + 1 ; j < points.size() ; j++) {
+                    allLines.add(new Line2D.Double(
+                              round(points.get(i).getX(), 3)
+                            , round(points.get(i).getY(), 3)
+                            , round(points.get(j).getX(), 3)
+                            , round(points.get(j).getY(), 3)));
             }
-            counter++;
         }
         return allLines;
     }
@@ -126,9 +126,9 @@ public class Points {
         ArrayList<Line2D> allLines = getAllPointToPointLines();
         ArrayList<Point2D> allIntersectionPoints = new ArrayList<>();
         for (int i = 0; i < allLines.size(); i++) {
-            for (int j = 1; j < allLines.size(); j++) {
+            for (int j = i + 1; j < allLines.size(); j++) {
                 Point2D possiblePoint = getLineLineIntersection(allLines.get(i), allLines.get(j));
-                if (possiblePoint != null) {
+                if (possiblePoint != null && !allIntersectionPoints.contains(possiblePoint)) {
                     allIntersectionPoints.add(possiblePoint);
                 }
             }
@@ -176,7 +176,8 @@ public class Points {
                 det3And4, y3LessY4) /
                 det1Less2And3Less4);
 
-        Point2D point = new Point2D.Double(x, y);
+        Point2D point = new Point2D.Double(round(x, 3), round(y, 3));
+//        Point2D point = new Point2D.Double(x,y);
         if(boundingShape.containsPoint(point)){
             return point;
         }

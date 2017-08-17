@@ -19,14 +19,11 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by Chris on 11/05/2017.
- */
 public class ViewPanel extends JPanel {
 
     Controller cont;
     int redrawFillCounter;
-    ArrayList<Path2D> fillSpaces;
+    ArrayList<Color> previousColors;
 
     public ViewPanel(Controller c) {
         this.cont = c;
@@ -37,6 +34,7 @@ public class ViewPanel extends JPanel {
         this.setBackground(Color.WHITE);
         this.setVisible(true);
         redrawFillCounter = 51;
+        previousColors = new ArrayList<>();
     }
 
     private Color randomColor() {
@@ -117,8 +115,6 @@ public class ViewPanel extends JPanel {
         }
     }
 
-
-
     private void findPolygons(Graphics2D g){
         Polygonizer polygonizer = new Polygonizer();
         GeometryFactory geometryFactory = new GeometryFactory();
@@ -144,6 +140,10 @@ public class ViewPanel extends JPanel {
     }
 
     private void drawJTSPolygonsAsPath2D(Graphics2D g, List<Polygon> polygons){
+        boolean refreshColors = previousColors.size() == polygons.size();
+        if(refreshColors) previousColors.clear();
+        int colorCounter = 0;
+
         for (Polygon polygon : polygons) {
             Path2D finalShape = new Path2D.Double();
             Coordinate[] coords = polygon.getCoordinates();
@@ -151,8 +151,48 @@ public class ViewPanel extends JPanel {
             for(int i = 1; i < coords.length; i++){
                 finalShape.lineTo(coords[i].x, coords[i].y);
             }
+            if(!refreshColors && previousColors.size() > 0){
+                previousColors.set(colorCounter, smudgeColor(previousColors.get(colorCounter)));
+                g.setColor(previousColors.get(colorCounter));
+            }else if(refreshColors && previousColors.size() == 0){
+
+            }
             g.fill(finalShape);
+            colorCounter++;
         }
+    }
+
+    private Color smudgeColor(Color color){
+        Random rand = new Random();
+
+        int newRed = color.getRed() + rand.nextInt(30) - 15;
+        int newGreen = color.getGreen() + rand.nextInt(30) - 15;
+        int newBlue = color.getBlue() + rand.nextInt(30) - 15;
+        if(newRed > 255)newRed=255;
+        if(newRed < 0)newRed=0;
+        if(newGreen > 255)newGreen=255;
+        if(newGreen < 0)newGreen=0;
+        if(newBlue > 255)newBlue=255;
+        if(newBlue < 0)newBlue=0;
+        return new Color(newRed, newGreen, newBlue);
+    }
+
+    private Color generateRandomColor() {
+        Color mix = new Color(0, 155, 255);
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        // mix the color
+        if (mix != null) {
+            red = (red + mix.getRed()) / 2;
+            green = (green + mix.getGreen()) / 2;
+            blue = (blue + mix.getBlue()) / 2;
+        }
+
+        Color color = new Color(red, green, blue);
+        return color;
     }
 
     @Override

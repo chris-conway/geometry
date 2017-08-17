@@ -89,10 +89,6 @@ public class Points {
         cont.getPoints().updatePoints();
     }
 
-//    public void getPointsAsLineString(){
-//        //LineString lineString = new LineString();
-//    }
-
     public ArrayList<Line2D> getAllPointToPointLinesFromIntersectionPoints(){
         ArrayList<Line2D> lines = new ArrayList<>();
         ArrayList<Point2D> intersectionPoints = getAllIntersectionPoints();
@@ -137,64 +133,6 @@ public class Points {
         ArrayList<Line2D> allLines = getAllPointToPointLines();
         allLines.remove(currentLine);
         return allLines.stream().map(lines -> getLineLineIntersection(currentLine, lines));
-    }
-
-    public ArrayList<Point2D[]> getTriosOfNearestPoints() {
-        System.out.println("Search started.");
-        long t = System.currentTimeMillis();
-        int counter = 0;
-        ArrayList<Point2D> searchPoints = getAllIntersectionPoints();
-        ArrayList<Point2D[]> foundGroups = new ArrayList<>();
-
-        while (searchPoints.size() >= 3) {
-            Point2D firstPoint = searchPoints.get(0);
-            searchPoints.remove(firstPoint);
-            double minDistance = Double.MAX_VALUE;
-            Point2D secondPoint = searchPoints.get(0);
-            for (int i = 0; i < searchPoints.size(); i++) {
-                double distance = firstPoint.distance(searchPoints.get(i));
-                if (distance < minDistance) {
-                    secondPoint = searchPoints.get(i);
-                    minDistance = distance;
-                }
-            }
-            searchPoints.remove(secondPoint);
-            Point2D thirdPoint = searchPoints.get(0);
-            for (int i = 0; i < searchPoints.size(); i++) {
-                double distance = firstPoint.distance(searchPoints.get(i));
-                if (distance < minDistance) {
-                    thirdPoint = searchPoints.get(i);
-                    minDistance = distance;
-                }
-            }
-            searchPoints.remove(thirdPoint);
-            Point2D foundGroup[] = {firstPoint, secondPoint, thirdPoint};
-            foundGroups.add(foundGroup);
-            counter++;
-        }
-        System.out.println("Time taken: " + (System.currentTimeMillis() - t) + " cycles: " + counter + " returning " + foundGroups.size() + " groups.");
-        return foundGroups;
-    }
-
-    public void getPointTrioGroups() {
-        MyPoint2D myPoints[] = new MyPoint2D[points.size()];
-        int counter = 0;
-        for (Point2D point : points) {
-            myPoints[counter] = new MyPoint2D(point.getX(), point.getY());
-        }
-
-        for (int i = 0; i < points.size() / 3; i++) {
-            ClosestPair closestPair1 = new ClosestPair(myPoints);
-            MyPoint2D firstPoint = closestPair1.either();
-            List<MyPoint2D> newPoints = new ArrayList<>();
-            Collections.addAll(newPoints, myPoints);
-            newPoints.remove(firstPoint);
-            myPoints = newPoints.toArray(myPoints);
-            ClosestPair closestPair2 = new ClosestPair(myPoints);
-
-        }
-
-
     }
 
     public ArrayList<Line2D> getAllNonIntersectingLinesFromInstersectionPointLines(){

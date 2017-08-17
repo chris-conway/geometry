@@ -15,10 +15,6 @@ public interface BoundingShape {
 
     Point2D getCenter();
 
-    ArrayList<Line2D> getAllPointToPointLines();
-
-    ArrayList<Point2D> getAllIntersectionPoints();
-
     boolean containsPoint(Point2D point);
 
 }

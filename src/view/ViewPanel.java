@@ -140,8 +140,8 @@ public class ViewPanel extends JPanel {
     }
 
     private void drawJTSPolygonsAsPath2D(Graphics2D g, List<Polygon> polygons){
-        boolean refreshColors = previousColors.size() == polygons.size();
-        if(refreshColors) previousColors.clear();
+        boolean maintainColor = previousColors.size() == polygons.size();
+        if(!maintainColor) previousColors.clear();
         int colorCounter = 0;
 
         for (Polygon polygon : polygons) {
@@ -151,11 +151,15 @@ public class ViewPanel extends JPanel {
             for(int i = 1; i < coords.length; i++){
                 finalShape.lineTo(coords[i].x, coords[i].y);
             }
-            if(!refreshColors && previousColors.size() > 0){
+            if(previousColors.size() == 0 && maintainColor == false){
+                Color newColor = generateRandomColor();
+                previousColors.add(newColor);
+                g.setColor(newColor);
+            }else if(maintainColor){
                 previousColors.set(colorCounter, smudgeColor(previousColors.get(colorCounter)));
                 g.setColor(previousColors.get(colorCounter));
-            }else if(refreshColors && previousColors.size() == 0){
-
+            }else{
+                previousColors.add(colorCounter, generateRandomColor());
             }
             g.fill(finalShape);
             colorCounter++;
@@ -165,9 +169,9 @@ public class ViewPanel extends JPanel {
     private Color smudgeColor(Color color){
         Random rand = new Random();
 
-        int newRed = color.getRed() + rand.nextInt(30) - 15;
-        int newGreen = color.getGreen() + rand.nextInt(30) - 15;
-        int newBlue = color.getBlue() + rand.nextInt(30) - 15;
+        int newRed = color.getRed() + rand.nextInt(20) - 10;
+        int newGreen = color.getGreen() + rand.nextInt(20) - 10;
+        int newBlue = color.getBlue() + rand.nextInt(20) - 10;
         if(newRed > 255)newRed=255;
         if(newRed < 0)newRed=0;
         if(newGreen > 255)newGreen=255;

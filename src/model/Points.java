@@ -75,7 +75,7 @@ public class Points {
 
     public void rotatePoints(boolean clockwise) {
 
-        double rotationSpeed = 1;
+        double rotationSpeed = 0.01;
 
         for (int i = 0; i < angles.size(); i++) {
             double currentSpacing = angles.get(i);

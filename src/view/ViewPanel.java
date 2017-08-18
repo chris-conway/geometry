@@ -46,6 +46,20 @@ public class ViewPanel extends JPanel {
         return new Color(r, g, b);
     }
 
+    private void paintBoundingShape(Graphics2D g){
+        ArrayList<Point2D> points = cont.getPoints().getPointsArray();
+        Path2D shape = new Path2D.Double();
+        if(points.size() > 0 && points != null) {
+            shape.moveTo(points.get(0).getX(), points.get(0).getY());
+            for (int i = 1; i < points.size(); i++){
+                shape.lineTo(points.get(i).getX(), points.get(i).getY());
+            }
+            g.setColor(Color.RED);
+            g.draw(shape);
+        }
+    }
+
+
     private ArrayList<Path2D> getFillSpaces() {
         ArrayList<Point2D> points = cont.getPoints().getPointsArray();
         ArrayList<Path2D> paths = new ArrayList<>();
@@ -168,7 +182,7 @@ public class ViewPanel extends JPanel {
     }
 
     private Color smudgeColor(Color color){
-        int upperBound = 2;
+        int upperBound = 10;
         int newRed = color.getRed() + (ThreadLocalRandom.current().nextInt(upperBound + 1) - upperBound/2);
         int newGreen = color.getGreen() + (ThreadLocalRandom.current().nextInt(upperBound + 1) - upperBound/2);
         int newBlue = color.getBlue() + (ThreadLocalRandom.current().nextInt(upperBound + 1) - upperBound/2);
@@ -199,6 +213,7 @@ public class ViewPanel extends JPanel {
         return color;
     }
 
+
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -209,6 +224,7 @@ public class ViewPanel extends JPanel {
 
         g.setStroke(new BasicStroke(1));
         findPolygons(g);
+
         this.repaint();
     }
 

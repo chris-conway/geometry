@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class ViewPanel extends JPanel {
@@ -167,11 +168,10 @@ public class ViewPanel extends JPanel {
     }
 
     private Color smudgeColor(Color color){
-        Random rand = new Random();
-
-        int newRed = color.getRed() + rand.nextInt(20) - 10;
-        int newGreen = color.getGreen() + rand.nextInt(20) - 10;
-        int newBlue = color.getBlue() + rand.nextInt(20) - 10;
+        int upperBound = 8;
+        int newRed = color.getRed() + ThreadLocalRandom.current().nextInt(upperBound) - upperBound/2;
+        int newGreen = color.getGreen() + ThreadLocalRandom.current().nextInt(upperBound) - upperBound/2;
+        int newBlue = color.getBlue() + ThreadLocalRandom.current().nextInt(upperBound) - upperBound/2;
         if(newRed > 255)newRed=255;
         if(newRed < 0)newRed=0;
         if(newGreen > 255)newGreen=255;

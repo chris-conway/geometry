@@ -168,10 +168,10 @@ public class ViewPanel extends JPanel {
     }
 
     private Color smudgeColor(Color color){
-        int upperBound = 8;
-        int newRed = color.getRed() + ThreadLocalRandom.current().nextInt(upperBound) - upperBound/2;
-        int newGreen = color.getGreen() + ThreadLocalRandom.current().nextInt(upperBound) - upperBound/2;
-        int newBlue = color.getBlue() + ThreadLocalRandom.current().nextInt(upperBound) - upperBound/2;
+        int upperBound = 2;
+        int newRed = color.getRed() + (ThreadLocalRandom.current().nextInt(upperBound + 1) - upperBound/2);
+        int newGreen = color.getGreen() + (ThreadLocalRandom.current().nextInt(upperBound + 1) - upperBound/2);
+        int newBlue = color.getBlue() + (ThreadLocalRandom.current().nextInt(upperBound + 1) - upperBound/2);
         if(newRed > 255)newRed=255;
         if(newRed < 0)newRed=0;
         if(newGreen > 255)newGreen=255;

@@ -13,8 +13,6 @@ import java.awt.*;
 import java.awt.Dimension;
 import java.awt.geom.*;
 import java.awt.geom.Point2D;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -32,7 +30,7 @@ public class ViewPanel extends JPanel {
         this.setMaximumSize(dim);
         this.setPreferredSize(dim);
         this.setMinimumSize(dim);
-        this.setBackground(Color.WHITE);
+        this.setBackground(Color.darkGray);
         this.setVisible(true);
         redrawFillCounter = 51;
         previousColors = new ArrayList<>();
@@ -149,6 +147,7 @@ public class ViewPanel extends JPanel {
         polygonizer.add(multiLineString);
         ArrayList<Polygon> polygons = (ArrayList<Polygon>) polygonizer.getPolygons();
         g.setColor(Color.CYAN);
+        removeJTSPolygonsFromOutsideBoundingShape(polygons);
         drawJTSPolygonsAsPath2D(g, polygons);
         g.setColor(Color.orange);
         lines.forEach(g::draw);
@@ -166,7 +165,7 @@ public class ViewPanel extends JPanel {
             for(int i = 1; i < coords.length; i++){
                 finalShape.lineTo(coords[i].x, coords[i].y);
             }
-            if(previousColors.size() == 0 && maintainColor == false){
+            if(previousColors.size() == 0 && !maintainColor){
                 Color newColor = generateRandomColor();
                 previousColors.add(newColor);
                 g.setColor(newColor);
@@ -179,6 +178,54 @@ public class ViewPanel extends JPanel {
             g.fill(finalShape);
             colorCounter++;
         }
+    }
+
+    private List<Polygon> removeJTSPolygonsFromOutsideBoundingShape(List<Polygon> polygons){
+        Polygon boundingShape = cont.getBoundingShapeAsPolygon();
+        return polygons.stream().filter(polygon -> boundingShape.contains(polygon)).collect(Collectors.toList());
+    }
+
+    private void drawJTSPolygonsGradientBySize(Graphics2D g, List<Polygon> polygons){
+        Comparator<Polygon> sortByDescendingLength = new Comparator<Polygon>() {
+            @Override
+            public int compare(Polygon pOne, Polygon pTwo) {
+                return Double.compare(pOne.getArea(), pTwo.getArea());
+            }
+        };
+        Color color = Color.white;
+        polygons.sort(sortByDescendingLength);
+        for (Polygon polygon : polygons) {
+            Path2D finalShape = new Path2D.Double();
+            Coordinate[] coords = polygon.getCoordinates();
+            finalShape.moveTo(coords[0].x, coords[0].y);
+            for (int i = 1; i < coords.length; i++) {
+                finalShape.lineTo(coords[i].x, coords[i].y);
+            }
+            g.setColor(color);
+            g.fill(finalShape);
+            color = new Color(color.getRed() - 1, color.getGreen() - 1, color.getBlue() - 1);
+        }
+    }
+
+    private Color closerToTargetColorByRandomAmount(Color color){
+        Color targetColor = new Color(155, 155, 155);
+        int newRed, newGreen, newBlue = 0;
+        if(color.getRed() > targetColor.getRed()){
+            newRed = ThreadLocalRandom.current().nextInt(targetColor.getRed(), color.getRed());
+        }else{
+            newRed = ThreadLocalRandom.current().nextInt(color.getRed(), targetColor.getRed());
+        }
+        if(color.getGreen() > targetColor.getGreen()){
+            newGreen = ThreadLocalRandom.current().nextInt(targetColor.getGreen(), color.getGreen());
+        }else {
+            newGreen = ThreadLocalRandom.current().nextInt(color.getGreen(), targetColor.getGreen());
+        }
+        if(color.getBlue() > targetColor.getBlue()){
+            newBlue = ThreadLocalRandom.current().nextInt(targetColor.getBlue(), color.getBlue());
+        }else{
+            newBlue = ThreadLocalRandom.current().nextInt(color.getBlue(), targetColor.getBlue());
+        }
+        return new Color(newRed, newGreen, newBlue);
     }
 
     private Color smudgeColor(Color color){
@@ -196,7 +243,7 @@ public class ViewPanel extends JPanel {
     }
 
     private Color generateRandomColor() {
-        Color mix = new Color(0, 155, 255);
+        Color mix = new Color(255, 200, 100);
         Random random = new Random();
         int red = random.nextInt(256);
         int green = random.nextInt(256);
